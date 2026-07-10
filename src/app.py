@@ -12,7 +12,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from storage import ActivityRepository
+try:
+    from .storage import ActivityRepository
+except ImportError:  # Allows running as `python app.py` from within `src/`
+    from storage import ActivityRepository
 
 app = FastAPI(title="Mergington High School API",
               description="API for viewing and signing up for extracurricular activities")
