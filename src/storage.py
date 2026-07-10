@@ -163,7 +163,8 @@ def _connect(self) -> sqlite3.Connection:
         with self._connect() as connection:
             activity = connection.execute(
                 """
-                SELECT 1
+                SELECT max_participants,
+                       (SELECT COUNT(*) FROM participants WHERE activity_name = activities.name) AS participant_count
                 FROM activities
                 WHERE name = ?
                 """,
@@ -171,7 +172,8 @@ def _connect(self) -> sqlite3.Connection:
             ).fetchone()
             if activity is None:
                 raise KeyError("Activity not found")
-
+            if activity["participant_count"] >= activity["max_participants"]:
+                raise ValueError("Activity is full")
             signed_up = connection.execute(
                 """
                 SELECT 1
