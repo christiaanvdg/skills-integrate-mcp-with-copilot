@@ -44,8 +44,6 @@ The application uses a simple data model with meaningful identifiers:
    - Maximum number of participants allowed
    - List of student emails who are signed up
 
-2. **Students** - Uses email as identifier:
-   - Name
-   - Grade level
+2. **Students** - Identified and stored by email address only
 
 All activity and participant data is stored in a local SQLite database, so signups survive server restarts.
