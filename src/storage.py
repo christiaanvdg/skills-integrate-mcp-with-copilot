@@ -139,22 +139,24 @@ def _connect(self) -> sqlite3.Connection:
             ).fetchall()
 
             results: dict[str, dict[str, Any]] = {}
-            for activity in activities:
-                participants = connection.execute(
-                    """
-                    SELECT email
-                    FROM participants
-                    WHERE activity_name = ?
-                    ORDER BY email
-                    """,
-                    (activity["name"],),
-                ).fetchall()
 
+            participants_rows = connection.execute(
+                """
+                SELECT activity_name, email
+                FROM participants
+                ORDER BY activity_name, email
+                """
+            ).fetchall()
+            participants_by_activity: dict[str, list[str]] = {}
+            for row in participants_rows:
+                participants_by_activity.setdefault(row["activity_name"], []).append(row["email"])
+
+            for activity in activities:
                 results[activity["name"]] = {
                     "description": activity["description"],
                     "schedule": activity["schedule"],
                     "max_participants": activity["max_participants"],
-                    "participants": [participant["email"] for participant in participants],
+                    "participants": participants_by_activity.get(activity["name"], []),
                 }
 
             return results
